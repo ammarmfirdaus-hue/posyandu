@@ -609,25 +609,30 @@
 
             // Utils Umur
             function hitungUmur(tanggalLahirStr) {
-                if (!tanggalLahirStr) return '-';
-                const dob = new Date(tanggalLahirStr);
-                const today = new Date();
-                let months = (today.getFullYear() - dob.getFullYear()) * 12;
-                months -= dob.getMonth();
-                months += today.getMonth();
-                let days = today.getDate() - dob.getDate();
-                if (days < 0) {
-                    months--;
-                    const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-                    days += prevMonth.getDate();
-                }
-                if (months < 0) return 'Belum lahir';
-                let umurTeks = '';
-                if (months > 0) umurTeks += `${months} Bln `;
-                if (days > 0 || months === 0) umurTeks += `${days} Hr`;
-                return umurTeks.trim();
-            }
+    if (!tanggalLahirStr) return '-';
 
+    const dob = new Date(tanggalLahirStr);
+    const today = new Date();
+
+    let years = today.getFullYear() - dob.getFullYear();
+    let months = today.getMonth() - dob.getMonth();
+    let days = today.getDate() - dob.getDate();
+
+    if (days < 0) {
+        months--;
+        const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+        days += prevMonth.getDate();
+    }
+
+    if (months < 0) {
+        years--;
+        months += 12;
+    }
+
+    if (years < 0) return 'Belum lahir';
+
+    return `${years} Tahun ${months} Bulan ${days} Hari`;
+}
             function updateRingkasan() {
                 const namaBayi = document.getElementById('namaBayi').value || '-';
                 const namaIbu = document.getElementById('namaIbu').value || '-';
