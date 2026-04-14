@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Pelaporan Mandiri - United Tractors</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* gray-100 */
+        }
+        
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .step-container {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .step-container.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ut-yellow { background-color: #FFC000; }
+        .text-ut-yellow { color: #FFC000; }
+        .ut-border-top { border-top: 4px solid #A68A56; }
+        
+        .input-error {
+            border-color: #EF4444 !important; 
+            background-color: #FEF2F2 !important; 
+        }
+
+        /* Styling untuk tab yang aktif */
+        .tab-active {
+            border-bottom: 3px solid #FFC000;
+            color: #1F2937;
+            font-weight: 700;
+        }
+        .tab-inactive {
+            border-bottom: 3px solid transparent;
+            color: #6B7280;
+            font-weight: 500;
+        }
+
+        /* Custom Checkbox */
+        .custom-checkbox:checked {
+            background-color: #FFC000;
+            border-color: #FFC000;
+        }
+    </style>
+</head>
+<body class="flex justify-center min-h-screen">
+
+    <div class="w-full max-w-md bg-[#FAFAFA] min-h-screen relative flex flex-col shadow-xl overflow-hidden">
+        
+        <!-- Header -->
+        <header class="bg-white px-5 py-4 flex items-center gap-3 z-10 border-b border-gray-100">
+            <!-- Menggunakan Logo UT Resmi -->
+            <img src="UT HD.png" alt="UT Logo" class="w-8 h-8 object-contain rounded-full bg-black p-0.5" onerror="this.src='https://ui-avatars.com/api/?name=UT&background=000&color=FFC000'">
+            <h1 class="font-bold text-gray-800 text-lg">United Tractors</h1>
+        </header>
+
+        <!-- Tab Navigation -->
+        <div class="flex bg-white border-b border-gray-200 z-10">
+            <button id="btnTabForm" class="flex-1 py-3 text-sm tab-active transition-colors">
+                <i class="ph ph-note-pencil mr-1 align-middle text-lg"></i> Form Input
+            </button>
+            <button id="btnTabHistory" class="flex-1 py-3 text-sm tab-inactive transition-colors">
+                <i class="ph ph-clock-counter-clockwise mr-1 align-middle text-lg"></i> Histori Data
+            </button>
+        </div>
+
+        <!-- ================= MAIN CONTENT: FORM ================= -->
+        <main id="viewForm" class="flex-1 overflow-y-auto no-scrollbar pb-24 block">
+            
+            <div class="px-5 pt-5 pb-4">
+                <div class="flex items-center gap-2 text-gray-800 font-bold text-lg mb-4">
+                    <i class="ph ph-chart-bar text-xl text-[#A68A56]"></i>
+                    <h2>Sistem Pelaporan Mandiri</h2>
+                </div>
+                
+                <div class="flex justify-between items-end mb-2">
+                    <span id="progressText" class="text-xs font-bold text-[#A68A56]">PROGRESS STEP 1/4</span>
+                    <span id="progressPercentage" class="text-xs font-bold text-gray-400 hidden">100%</span>
+                </div>
+                
+                <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
+                    <div id="progressBar" class="h-full ut-yellow rounded-full transition-all duration-300" style="width: 25%;"></div>
+                </div>
+            </div>
+
+            <form id="pelaporanForm" class="px-5">
+                
+                <!-- STEP 1: Identitas Posyandu -->
+                <div id="step1" class="step-container active">
+                    
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-5 overflow-hidden">
+                        <div class="ut-border-top px-4 py-3 flex items-center gap-2 bg-gray-50 border-b border-gray-100">
+                            <i class="ph ph-storefront text-[#A68A56] text-lg"></i>
+                            <h3 class="font-semibold text-gray-800 text-sm">Identitas Posyandu</h3>
+                        </div>
+                        <div class="p-4 space-y-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Nama Posyandu <span class="text-red-500">*</span></label>
+                                <input type="text" id="namaPosyandu" data-type="name" class="w-full bg-gray-100 border border-transparent focus:border-[#FFC000] focus:bg-white rounded-lg px-3 py-2.5 text-sm outline-none transition-colors required-input" placeholder="Masukkan nama posyandu">
+                                <p class="text-red-500 text-[10px] hidden mt-1 error-msg"></p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">ID Posyandu <span class="text-red-500">*</span></label>
+                                <input type="text" id="idPosyandu" class="w-full bg-gray-100 border border-transparent focus:border-[#FFC000] focus:bg-white rounded-lg px-3 py-2.5 text-sm outline-none transition-colors required-input" placeholder="Contoh: PS-10293">
+                                <p class="text-red-500 text-[10px] hidden mt-1 error-msg"></p>
+                            </div>
+                            
+                            <!-- Dropdown Provinsi & Kabupaten -->
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Provinsi <span class="text-red-500">*</span></label>
+                                <div class="relative">
+                                    <select id="provinsi" class="w-full bg-gray-100 border border-transparent focus:border-[#FFC000] focus:bg-white rounded-lg px-3 py-2.5 text-sm outline-none transition-colors appearance-none required-input">
+                                        <option value="">Pilih Provinsi</option>
+                                        <!-- Opsi provinsi akan diisi via JS -->
+                                    </select>
+                                    <i class="ph ph-caret-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                                </div>
+                                <p class="text-red-500 text-[10px] hidden mt-1 error-msg"></p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Kabupaten / Kota <span class="text-red-500">*</span></label>
+                                <div class="relative">
+                                    <select id="kabupaten" disabled class="w-full bg-gray-100 border border-transparent focus:border-[#FFC000] focus:bg-white rounded-lg px-3 py-2.5 text-sm outline-none transition-colors appearance-none required-input disabled:opacity-50 disabled:cursor-not-allowed">
+                                        <option value="">Pilih Provinsi Terlebih Dahulu</option>
+                                    </select>
+                                    <i class="ph ph-caret-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                                </div>
+                                <p class="text-red-500 text-[10px] hidden mt-1 error-msg"></p>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Desa / Kelurahan <span class="text-red-500">*</span></label>
+                                <input type="text" id="desa" class="w-full bg-gray-100 border border-transparent focus:border-[#FFC000] focus:bg-white rounded-lg px-3 py-2.5 text-sm outline-none transition-colors required-input" placeholder="Nama desa">
+                                <p class="text-red-500 text-[10px] hidden mt-1 error-msg"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-5 overflow-hidden">
+                        <div class="ut-border-top px-4 py-3 flex items-center gap-2 bg-gray-50 border-b border-gray-100">
+                            <i class="ph ph-identification-card text-[#A68A56] text-lg"></i>
+                            <h3 class="font-semibold text-gray-800 text-sm">Petugas Posyandu</h3>
+                        </div>
+                        <div class="p-4 space-y-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Nama Petugas <span class="text-red-500">*</span></label>
+                                <div class="relative flex items-center">
+                                    <i class="ph ph-user absolute left-3 text-gray-400"></i>
+                                    <input type="text" id="namaPetugas" data-type="name" class="w-full bg-gray-100 border border-transparent focus:border-[#FFC000] focus:bg-white rounded-lg pl-9 pr-3 py-2.5 text-sm outline-none transition-colors required-input" placeholder="Nama lengkap petugas">
+                                </div>
+                                <p class="text-red-500 text-[10px] hidden mt-1 error-msg"></p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">No HP Petugas <span class="text-red-500">*</span></label>
+                                <div class="relative flex items-center">
+                                    <i class="ph ph-phone absolute left-3 text-gray-400"></i>
+                                    <input type="tel" id="hpPetugas" data-type="phone" class="w-full bg-gray-100 border border-transparent focus:border-[#FFC000] focus:bg-white rounded-lg pl-9 pr-3 py-2.5 text-sm outline-none transition-colors required-input" placeholder="0812 3456 7890">
+                                </div>
+                                <p class="text-red-500 text-[10px] hidden mt-1 error-msg"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 2: Identitas Orang Tua -->
+                <div id="step2" class="step-container">
+                    
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-5 overflow-hidden">
+                        <div class="ut-border-top px-4 py-3 flex items-center gap-2 bg-gray-50 border-b border-gray-100">
+                            <i class="ph ph-user text-[#A68A56] text-lg"></i>
+                            <h3 class="font-semibold text-gray-800 text-sm">Identitas Orang Tua (Ayah)</h3>
+                        </div>
+                        <div class="p-4 space-y-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Nama Ayah <span class="text-red-500">*</span></label>
+                                <input type="text" id="namaAyah" data-type="name" class="w-full bg-gray-100 border border-transparent focus:border-[#FFC000] focus:bg-white rounded-lg px-3 py-2.5 text-sm outline-none transition-colors required-input" placeholder="Masukkan nama lengkap ayah">
+                                <p class="text-red-500 text-[10px] hidden mt-1 error-msg"></p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Alamat Ayah <span class="text-red-500">*</span></label>
+                                <textarea id="alamatAyah" rows="2" class="w-full bg-gray-100 border border-transparent focus:border-[#FFC000] focus:bg-white rounded-lg px-3 py-2.5 text-sm outline-none transition-colors resize-none required-input" placeholder="Masukkan alamat domisili lengkap"></textarea>
+                                <p class="text-red-500 text-[10px] hidden mt-1 error-msg"></p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">No HP Ayah <span class="text-red-500">*</span></label>
+                                <div class="flex items-stretch w-full bg-gray-100 rounded-lg border border-transparent focus-within:border-[#FFC000] focus-within:bg-white transition-colors overflow-hidden">
+                                    <span class="flex items-center justify-center px-3 text-sm font-medium text-gray-500 bg-gray-200">+62</span>
+                                    <input type="tel" id="hpAyah" data-type="phone" class="w-full bg-transparent px-3 py-2.5 text-sm outline-none required-input" placeholder="812 3456 7890">
+                                </div>
+                                <p class="text-red-500 text-[10px] hidden mt-1 error-msg"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-5 overflow-hidden">
+                        <div class="ut-border-top px-4 py-3 flex items-center gap-2 bg-gray-50 border-b border-gray-100">
+                            <i class="ph ph-user text-[#A68A56] text-lg"></i>
+                            <h3 class="font-semibold text-gray-800 text-sm">Identitas Orang Tua (Ibu)</h3>
+                        </div>
+                        <div class="p-4 space-y-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Nama Ibu <span class="text-red-500">*</span></label>
+                                <input type="text" id="namaIbu" data-type="name" class="w-full bg-gray-100 border border-transparent focus:border-[#FFC000] focus:bg-white rounded-lg px-3 py-2.5 text-sm outline-none transition-colors required-input" placeholder="Masukkan nama lengkap ibu">
+                                <p class="text-red-500 text-[10px] hidden mt-1 error-msg"></p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Alamat Ibu <span class="text-red-500">*</span></label>
+                                <textarea id="alamatIbu" rows="2" class="w-full bg-gray-100 border border-transparent focus:border-[#FFC000] focus:bg-white rounded-lg px-3 py-2.5 text-sm outline-none transition-colors resize-none required-input" placeholder="Masukkan alamat domisili lengkap"></textarea>
+                                <p class="text-red-500 text-[10px] hidden mt-1 error-msg"></p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">No HP Ibu <span class="text-red-500">*</span></label>
+                                <div class="flex items-stretch w-full bg-gray-100 rounded-lg border border-transparent focus-within:border-[#FFC000] focus-within:bg-white transition-colors overflow-hidden">
+                                    <span class="flex items-center justify-center px-3 text-sm font-medium text-gray-500 bg-gray-200">+62</span>
+                                    <input type="tel" id="hpIbu" data-type="phone" class="w-full bg-transparent px-3 py-2.5 text-sm outline-none required-input" placeholder="812 3456 7890">
+                                </div>
+                                <p class="text-red-500 text-[10px] hidden mt-1 error-msg"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 3: Identitas Bayi -->
+                <div id="step3" class="step-container">
+                    
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-5 overflow-hidden">
+                        <div class="ut-border-top px-4 py-3 flex items-center gap-2 bg-gray-50 border-b border-gray-100">
+                            <div class="w-6 h-6 rounded-full ut-yellow flex items-center justify-center text-white">
+                                <i class="ph ph-baby text-sm"></i>
+                            </div>
+                            <h3 class="font-semibold text-gray-800 text-sm">Identitas Bayi / Balita</h3>
+                        </div>
+                        <div class="p-4 space-y-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
+                                <input type="text" id="namaBayi" data-type="name" class="w-full bg-gray-100 border border-transparent focus:border-[#FFC000] focus:bg-white rounded-lg px-3 py-2.5 text-sm outline-none transition-colors required-input" placeholder="Contoh: Budi Santoso">
+                                <p class="text-red-500 text-[10px] hidden mt-1 error-msg"></p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Jenis Kelamin <span class="text-red-500">*</span></label>
+                                <div class="relative">
+                                    <select id="jenisKelamin" class="w-full bg-gray-100 border border-transparent focus:border-[#FFC000] focus:bg-white rounded-lg px-3 py-2.5 text-sm outline-none transition-colors appearance-none required-input">
+                                        <option value="">Pilih jenis kelamin</option>
+                                        <option value="Laki-laki">Laki-laki</option>
+                                        <option value="Perempuan">Perempuan</option>
+                                    </select>
+                                    <i class="ph ph-caret-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                                </div>
+                                <p class="text-red-500 text-[10px] hidden mt-1 error-msg"></p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Tanggal Lahir <span class="text-red-500">*</span></label>
+                                <input type="date" id="tanggalLahir" class="w-full bg-gray-100 border border-transparent focus:border-[#FFC000] focus:bg-white rounded-lg px-3 py-2.5 text-sm outline-none transition-colors required-input">
+                                <p class="text-red-500 text-[10px] hidden mt-1 error-msg"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 4: Hasil & Tindakan -->
+                <div id="step4" class="step-container">
+                    
+                    <!-- Ringkasan -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-5 overflow-hidden">
+                        <div class="ut-border-top px-4 py-3 flex items-center gap-2 bg-gray-50 border-b border-gray-100">
+                            <i class="ph ph-users text-[#3B82F6] text-lg"></i>
+                            <h3 class="font-semibold text-[#3B82F6] text-sm text-xs tracking-wider">RINGKASAN DATA</h3>
+                        </div>
+                        <div class="p-4 space-y-3">
+                            <div>
+                                <span class="block text-[10px] font-bold text-gray-400 uppercase">NAMA BAYI</span>
+                                <p id="summaryNamaBayi" class="text-sm font-semibold text-gray-800">-</p>
+                            </div>
+                            <div>
+                                <span class="block text-[10px] font-bold text-gray-400 uppercase">NAMA IBU</span>
+                                <p id="summaryNamaIbu" class="text-sm font-semibold text-gray-800">-</p>
+                            </div>
+                            <div>
+                                <span class="block text-[10px] font-bold text-gray-400 uppercase">UMUR BAYI</span>
+                                <p id="summaryUmurBayi" class="text-sm font-semibold text-gray-800">-</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hasil Pengukuran -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-5 overflow-hidden">
+                        <div class="ut-border-top px-4 py-3 flex items-center gap-2 bg-gray-50 border-b border-gray-100">
+                            <i class="ph ph-ruler text-[#A68A56] text-lg"></i>
+                            <h3 class="font-semibold text-gray-800 text-sm">Hasil Pengukuran</h3>
+                        </div>
+                        <div class="p-4 space-y-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Berat Badan (kg) <span class="text-red-500">*</span></label>
+                                <div class="flex items-stretch w-full bg-gray-100 rounded-lg border border-transparent focus-within:border-[#FFC000] focus-within:bg-white transition-colors overflow-hidden">
+                                    <input type="number" id="beratBadan" step="0.1" class="w-full bg-transparent px-3 py-2.5 text-sm outline-none required-input" placeholder="0.0">
+                                    <span class="flex items-center justify-center px-3 text-sm text-gray-500 bg-gray-200">kg</span>
+                                </div>
+                                <p class="text-red-500 text-[10px] hidden mt-1 error-msg"></p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Tinggi Badan (cm) <span class="text-red-500">*</span></label>
+                                <div class="flex items-stretch w-full bg-gray-100 rounded-lg border border-transparent focus-within:border-[#FFC000] focus-within:bg-white transition-colors overflow-hidden">
+                                    <input type="number" id="tinggiBadan" step="0.1" class="w-full bg-transparent px-3 py-2.5 text-sm outline-none required-input" placeholder="0.0">
+                                    <span class="flex items-center justify-center px-3 text-sm text-gray-500 bg-gray-200">cm</span>
+                                </div>
+                                <p class="text-red-500 text-[10px] hidden mt-1 error-msg"></p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Lingkar Kepala (cm) <span class="text-red-500">*</span></label>
+                                <div class="flex items-stretch w-full bg-gray-100 rounded-lg border border-transparent focus-within:border-[#FFC000] focus-within:bg-white transition-colors overflow-hidden">
+                                    <input type="number" id="lingkarKepala" step="0.1" class="w-full bg-transparent px-3 py-2.5 text-sm outline-none required-input" placeholder="0.0">
+                                    <span class="flex items-center justify-center px-3 text-sm text-gray-500 bg-gray-200">cm</span>
+                                </div>
+                                <p class="text-red-500 text-[10px] hidden mt-1 error-msg"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tindakan Tambahan (Opsional) -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-5 overflow-hidden">
+                        <div class="ut-border-top px-4 py-3 flex items-center gap-2 bg-gray-50 border-b border-gray-100">
+                            <i class="ph ph-first-aid-kit text-[#A68A56] text-lg"></i>
+                            <h3 class="font-semibold text-gray-800 text-sm">Tindakan Tambahan <span class="text-[10px] font-normal text-gray-500"></span></h3>
+                        </div>
+                        <div class="p-4 space-y-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Imunisasi</label>
+                                <div class="relative">
+                                    <select id="imunisasi" class="w-full bg-gray-100 border border-transparent focus:border-[#FFC000] focus:bg-white rounded-lg px-3 py-2.5 text-sm outline-none transition-colors appearance-none">
+                                        <option value="-">Belum / Tidak Ada Imunisasi</option>
+                                        <option value="Hepatitis B">Hepatitis B (HB-0)</option>
+                                        <option value="BCG & Polio 1">BCG & Polio 1</option>
+                                        <option value="DPT-HB-Hib 1 & Polio 2">DPT-HB-Hib 1 & Polio 2</option>
+                                        <option value="DPT-HB-Hib 2 & Polio 3">DPT-HB-Hib 2 & Polio 3</option>
+                                        <option value="DPT-HB-Hib 3 & Polio 4">DPT-HB-Hib 3 & Polio 4</option>
+                                        <option value="Campak">Campak / MR</option>
+                                    </select>
+                                    <i class="ph ph-caret-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                                </div>
+                            </div>
+                            
+                            <!-- Checkboxes -->
+                            <div class="space-y-3">
+                                <label class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors">
+                                    <div class="flex items-center h-5 mt-0.5">
+                                        <input type="checkbox" id="vitaminA" class="custom-checkbox w-4 h-4 text-[#FFC000] border-gray-300 rounded focus:ring-0 cursor-pointer">
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-sm font-semibold text-gray-800">Beri Kapsul Vitamin A</span>
+                                        <span class="text-[10px] text-gray-500">Diberikan pada bulan Februari dan Agustus</span>
+                                    </div>
+                                </label>
+                                
+                                <label class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors">
+                                    <div class="flex items-center h-5 mt-0.5">
+                                        <input type="checkbox" id="obatCacing" class="custom-checkbox w-4 h-4 text-[#FFC000] border-gray-300 rounded focus:ring-0 cursor-pointer">
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-sm font-semibold text-gray-800">Beri Obat Cacing</span>
+                                        <span class="text-[10px] text-gray-500">Untuk anak usia di atas 12 bulan</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+        </main>
+
+        <!-- ================= MAIN CONTENT: HISTORI ================= -->
+        <main id="viewHistory" class="flex-1 overflow-y-auto no-scrollbar pb-6 bg-[#f3f4f6] hidden">
+            <div class="px-5 pt-6 pb-4">
+                
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="font-bold text-gray-800 text-lg">Histori Pelaporan</h2>
+                    <span id="totalHistori" class="bg-[#FFC000] text-gray-900 text-xs font-bold px-2 py-1 rounded">0 Data</span>
+                </div>
+                
+                <!-- Filter Section -->
+                <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm mb-4 flex items-center justify-between">
+                    <span class="text-xs font-semibold text-gray-500"><i class="ph ph-funnel align-middle mr-1"></i>Filter Waktu</span>
+                    <div class="relative w-36">
+                        <select id="filterHistory" class="w-full bg-gray-50 border border-gray-200 rounded-lg pl-3 pr-8 py-1.5 text-xs font-medium text-gray-700 outline-none focus:border-[#FFC000] appearance-none transition-colors cursor-pointer">
+                            <option value="semua">Semua Data</option>
+                            <option value="harian">Hari Ini</option>
+                            <option value="bulanan">Bulan Ini</option>
+                            <option value="tahunan">Tahun Ini</option>
+                        </select>
+                        <i class="ph ph-caret-down absolute right-2.5 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i>
+                    </div>
+                </div>
+                
+                <!-- Container untuk List Histori -->
+                <div id="historyList" class="space-y-4">
+                    <!-- Data histori akan di-render di sini via JS -->
+                </div>
+                
+                <!-- State Kosong (jika belum ada data) -->
+                <div id="emptyHistory" class="flex flex-col items-center justify-center py-12 text-center hidden">
+                    <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-4">
+                        <i class="ph ph-folder-open text-3xl text-gray-400"></i>
+                    </div>
+                    <h3 class="text-gray-800 font-semibold mb-1">Belum Ada Data</h3>
+                    <p class="text-xs text-gray-500">Hasil filter/histori Anda akan muncul di sini.</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Sticky Footer Navigation (Hanya untuk form input) -->
+        <footer id="formFooter" class="absolute bottom-0 w-full bg-white border-t border-gray-200 px-5 py-4 z-20 flex justify-between items-center rounded-b-xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+            <button type="button" id="btnPrev" class="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-800 transition-colors disabled:opacity-30 disabled:cursor-not-allowed" disabled>
+                <i class="ph ph-arrow-left"></i>
+                Kembali
+            </button>
+            
+            <button type="button" id="btnNext" class="ut-yellow hover:bg-yellow-500 text-gray-900 font-bold text-sm px-6 py-2.5 rounded-lg flex items-center gap-2 transition-colors shadow-sm">
+                <span>Selanjutnya</span>
+                <i class="ph ph-arrow-right"></i>
+            </button>
+            
+            <button type="button" id="btnSubmit" class="hidden bg-[#10B981] hover:bg-emerald-600 text-white font-bold text-sm px-6 py-2.5 rounded-lg flex items-center gap-2 transition-colors shadow-sm">
+                <span>Simpan Data</span>
+                <i class="ph ph-check-circle"></i>
+            </button>
+        </footer>
+
+        <!-- ================= CUSTOM MODAL POP-UP ================= -->
+        <div id="successModal" class="absolute inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-40 hidden backdrop-blur-sm transition-opacity duration-300 opacity-0">
+            <div class="bg-white rounded-2xl p-6 w-[85%] max-w-sm text-center transform scale-95 transition-transform duration-300 shadow-2xl">
+                <!-- Icon Centang Animasi -->
+                <div class="w-16 h-16 bg-[#D1FAE5] rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-sm">
+                    <i class="ph ph-check-circle text-4xl text-[#10B981]"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Data Tersimpan!</h3>
+                <p class="text-sm text-gray-500 mb-6 leading-relaxed">Pengukuran posyandu ananda <span id="modalNamaBayi" class="font-bold text-gray-700"></span> telah berhasil dicatat ke dalam database United Tractors.</p>
+                <button id="btnCloseModal" class="w-full ut-yellow hover:bg-yellow-500 text-gray-900 font-bold py-3 rounded-xl transition-colors shadow-sm text-sm">
+                    Lihat Histori
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Script Logika Form -->
+    <script>
+        // Data Wilayah Indonesia (38 Provinsi beserta beberapa contoh Kabupaten/Kota per provinsi)
+        const dataWilayah = {
+            "Aceh": ["Banda Aceh", "Lhokseumawe", "Aceh Besar", "Pidie", "Bireuen"],
+            "Sumatera Utara": ["Medan", "Deli Serdang", "Binjai", "Pematangsiantar", "Simalungun"],
+            "Sumatera Barat": ["Padang", "Bukittinggi", "Payakumbuh", "Agam", "Padang Pariaman"],
+            "Riau": ["Pekanbaru", "Dumai", "Kampar", "Bengkalis", "Siak"],
+            "Jambi": ["Jambi", "Sungai Penuh", "Merangin", "Batanghari", "Bungo"],
+            "Sumatera Selatan": ["Palembang", "Prabumulih", "Lubuklinggau", "Banyuasin", "Ogan Ilir"],
+            "Bengkulu": ["Bengkulu", "Rejang Lebong", "Mukomuko", "Seluma", "Kaur"],
+            "Lampung": ["Bandar Lampung", "Metro", "Lampung Selatan", "Lampung Tengah", "Pesawaran"],
+            "Kepulauan Bangka Belitung": ["Pangkalpinang", "Bangka", "Belitung", "Bangka Barat", "Belitung Timur"],
+            "Kepulauan Riau": ["Batam", "Tanjungpinang", "Bintan", "Karimun", "Natuna"],
+            "DKI Jakarta": ["Jakarta Pusat", "Jakarta Utara", "Jakarta Barat", "Jakarta Selatan", "Jakarta Timur", "Kepulauan Seribu"],
+            "Jawa Barat": ["Bandung", "Bogor", "Bekasi", "Depok", "Cirebon", "Garut", "Tasikmalaya"],
+            "Jawa Tengah": ["Semarang", "Surakarta", "Banyumas", "Magelang", "Kendal", "Cilacap"],
+            "DI Yogyakarta": ["Yogyakarta", "Sleman", "Bantul", "Gunungkidul", "Kulon Progo"],
+            "Jawa Timur": ["Surabaya", "Malang", "Sidoarjo", "Gresik", "Banyuwangi", "Jember", "Kediri"],
+            "Banten": ["Tangerang", "Tangerang Selatan", "Serang", "Cilegon", "Lebak", "Pandeglang"],
+            "Bali": ["Denpasar", "Badung", "Gianyar", "Buleleng", "Tabanan"],
+            "Nusa Tenggara Barat": ["Mataram", "Bima", "Lombok Barat", "Lombok Tengah", "Lombok Timur"],
+            "Nusa Tenggara Timur": ["Kupang", "Manggarai", "Sikka", "Ende", "Sumba Timur"],
+            "Kalimantan Barat": ["Pontianak", "Singkawang", "Kubu Raya", "Ketapang", "Sintang"],
+            "Kalimantan Tengah": ["Palangka Raya", "Kotawaringin Timur", "Kotawaringin Barat", "Kapuas", "Barito Utara"],
+            "Kalimantan Selatan": ["Banjarmasin", "Banjarbaru", "Banjar", "Tanah Laut", "Tabalong"],
+            "Kalimantan Timur": ["Samarinda", "Balikpapan", "Bontang", "Kutai Kartanegara", "Kutai Timur"],
+            "Kalimantan Utara": ["Tarakan", "Bulungan", "Nunukan", "Malinau", "Tana Tidung"],
+            "Sulawesi Utara": ["Manado", "Bitung", "Tomohon", "Minahasa", "Bolaang Mongondow"],
+            "Sulawesi Tengah": ["Palu", "Donggala", "Poso", "Banggai", "Parigi Moutong"],
+            "Sulawesi Selatan": ["Makassar", "Parepare", "Palopo", "Gowa", "Bone", "Maros"],
+            "Sulawesi Tenggara": ["Kendari", "Baubau", "Konawe", "Kolaka", "Muna"],
+            "Gorontalo": ["Gorontalo", "Bone Bolango", "Boalemo", "Pohuwato", "Gorontalo Utara"],
+            "Sulawesi Barat": ["Mamuju", "Majene", "Polewali Mandar", "Mamasa", "Pasangkayu"],
+            "Maluku": ["Ambon", "Tual", "Maluku Tengah", "Seram Bagian Barat", "Maluku Tenggara"],
+            "Maluku Utara": ["Ternate", "Tidore Kepulauan", "Halmahera Utara", "Halmahera Selatan", "Pulau Morotai"],
+            "Papua": ["Jayapura", "Keerom", "Sarmi", "Biak Numfor", "Kepulauan Yapen"],
+            "Papua Barat": ["Manokwari", "Fakfak", "Kaimana", "Teluk Bintuni", "Teluk Wondama"],
+            "Papua Selatan": ["Merauke", "Boven Digoel", "Mappi", "Asmat"],
+            "Papua Tengah": ["Nabire", "Mimika", "Paniai", "Dogiyai", "Intan Jaya"],
+            "Papua Pegunungan": ["Jayawijaya", "Lanny Jaya", "Tolikara", "Yahukimo", "Pegunungan Bintang"],
+            "Papua Barat Daya": ["Sorong", "Raja Ampat", "Tambrauw", "Maybrat", "Sorong Selatan"]
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            let currentStep = 1;
+            const totalSteps = 4;
+            
+            // Elements
+            const btnPrev = document.getElementById('btnPrev');
+            const btnNext = document.getElementById('btnNext');
+            const btnSubmit = document.getElementById('btnSubmit');
+            const progressText = document.getElementById('progressText');
+            const progressPercentage = document.getElementById('progressPercentage');
+            const progressBar = document.getElementById('progressBar');
+            
+            // Tabs & Modal
+            const viewForm = document.getElementById('viewForm');
+            const viewHistory = document.getElementById('viewHistory');
+            const formFooter = document.getElementById('formFooter');
+            const btnTabForm = document.getElementById('btnTabForm');
+            const btnTabHistory = document.getElementById('btnTabHistory');
+            const successModal = document.getElementById('successModal');
+            const btnCloseModal = document.getElementById('btnCloseModal');
+            const selectFilterHistory = document.getElementById('filterHistory');
+
+            // Setup Dropdown Wilayah
+            const selectProvinsi = document.getElementById('provinsi');
+            const selectKabupaten = document.getElementById('kabupaten');
+
+            function setupWilayah() {
+                // Populate Provinsi
+                for (const prov in dataWilayah) {
+                    const option = document.createElement('option');
+                    option.value = prov;
+                    option.textContent = prov;
+                    selectProvinsi.appendChild(option);
+                }
+
+                // Event Listener ganti Provinsi
+                selectProvinsi.addEventListener('change', function() {
+                    const prov = this.value;
+                    selectKabupaten.innerHTML = '';
+                    
+                    if (prov && dataWilayah[prov]) {
+                        selectKabupaten.disabled = false;
+                        selectKabupaten.classList.remove('disabled:opacity-50', 'disabled:cursor-not-allowed');
+                        
+                        const defaultOpt = document.createElement('option');
+                        defaultOpt.value = "";
+                        defaultOpt.textContent = "Pilih Kabupaten / Kota";
+                        selectKabupaten.appendChild(defaultOpt);
+
+                        dataWilayah[prov].forEach(kab => {
+                            const option = document.createElement('option');
+                            option.value = kab;
+                            option.textContent = kab;
+                            selectKabupaten.appendChild(option);
+                        });
+                    } else {
+                        selectKabupaten.disabled = true;
+                        selectKabupaten.classList.add('disabled:opacity-50', 'disabled:cursor-not-allowed');
+                        const defaultOpt = document.createElement('option');
+                        defaultOpt.value = "";
+                        defaultOpt.textContent = "Pilih Provinsi Terlebih Dahulu";
+                        selectKabupaten.appendChild(defaultOpt);
+                    }
+                });
+            }
+            setupWilayah();
+
+            // Setup Tabs Logic
+            function switchTab(tab) {
+                if (tab === 'form') {
+                    btnTabForm.className = "flex-1 py-3 text-sm tab-active transition-colors";
+                    btnTabHistory.className = "flex-1 py-3 text-sm tab-inactive transition-colors";
+                    viewForm.classList.remove('hidden');
+                    viewForm.classList.add('block');
+                    viewHistory.classList.remove('block');
+                    viewHistory.classList.add('hidden');
+                    formFooter.classList.remove('hidden');
+                    formFooter.classList.add('flex');
+                } else {
+                    btnTabForm.className = "flex-1 py-3 text-sm tab-inactive transition-colors";
+                    btnTabHistory.className = "flex-1 py-3 text-sm tab-active transition-colors";
+                    viewForm.classList.remove('block');
+                    viewForm.classList.add('hidden');
+                    viewHistory.classList.remove('hidden');
+                    viewHistory.classList.add('block');
+                    formFooter.classList.remove('flex');
+                    formFooter.classList.add('hidden');
+                    renderHistory(); 
+                }
+            }
+
+            btnTabForm.addEventListener('click', () => switchTab('form'));
+            btnTabHistory.addEventListener('click', () => switchTab('history'));
+            selectFilterHistory.addEventListener('change', () => renderHistory());
+
+            // Utils Umur
+            function hitungUmur(tanggalLahirStr) {
+                if (!tanggalLahirStr) return '-';
+                const dob = new Date(tanggalLahirStr);
+                const today = new Date();
+                let months = (today.getFullYear() - dob.getFullYear()) * 12;
+                months -= dob.getMonth();
+                months += today.getMonth();
+                let days = today.getDate() - dob.getDate();
+                if (days < 0) {
+                    months--;
+                    const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+                    days += prevMonth.getDate();
+                }
+                if (months < 0) return 'Belum lahir';
+                let umurTeks = '';
+                if (months > 0) umurTeks += `${months} Bln `;
+                if (days > 0 || months === 0) umurTeks += `${days} Hr`;
+                return umurTeks.trim();
+            }
+
+            function updateRingkasan() {
+                const namaBayi = document.getElementById('namaBayi').value || '-';
+                const namaIbu = document.getElementById('namaIbu').value || '-';
+                const tanggalLahir = document.getElementById('tanggalLahir').value;
+                document.getElementById('summaryNamaBayi').textContent = namaBayi;
+                document.getElementById('summaryNamaIbu').textContent = namaIbu;
+                document.getElementById('summaryUmurBayi').textContent = hitungUmur(tanggalLahir);
+            }
+
+            // Validasi Khusus
+            function showError(inputElement, message) {
+                inputElement.classList.add('input-error');
+                const errorEl = inputElement.parentElement.nextElementSibling;
+                if(errorEl && errorEl.classList.contains('error-msg')) {
+                    errorEl.textContent = message;
+                    errorEl.classList.remove('hidden');
+                }
+            }
+
+            function hideError(inputElement) {
+                inputElement.classList.remove('input-error');
+                const errorEl = inputElement.parentElement.nextElementSibling;
+                if(errorEl && errorEl.classList.contains('error-msg')) {
+                    errorEl.classList.add('hidden');
+                }
+                const errorElAlt = inputElement.nextElementSibling;
+                if(errorElAlt && errorElAlt.classList.contains('error-msg')) {
+                     errorElAlt.classList.add('hidden');
+                }
+            }
+
+            function validateCurrentStep() {
+                const currentContainer = document.getElementById(`step${currentStep}`);
+                const requiredInputs = currentContainer.querySelectorAll('.required-input');
+                let isValid = true;
+
+                requiredInputs.forEach(input => {
+                    hideError(input);
+                    let val = input.value.trim();
+                    let inputValid = true;
+
+                    if (!val) {
+                        inputValid = false;
+                        showError(input, "Wajib diisi");
+                    } else {
+                        if (input.dataset.type === 'name' && val.length < 3) {
+                            inputValid = false;
+                            showError(input, "Nama minimal 3 karakter");
+                        }
+                        if (input.dataset.type === 'phone') {
+                            const onlyNumbers = /^\d+$/.test(val);
+                            if (!onlyNumbers) {
+                                inputValid = false;
+                                showError(input, "Hanya boleh berisi angka");
+                            } else if (val.length < 12) {
+                                inputValid = false;
+                                showError(input, "Minimal 12 digit angka");
+                            }
+                        }
+                    }
+
+                    if (!inputValid) {
+                        isValid = false;
+                        input.addEventListener('input', function() { hideError(this); }, { once: true });
+                    }
+                });
+
+                return isValid;
+            }
+
+            function updateUI() {
+                for (let i = 1; i <= totalSteps; i++) {
+                    document.getElementById(`step${i}`).classList.remove('active');
+                }
+                document.getElementById(`step${currentStep}`).classList.add('active');
+
+                const progress = (currentStep / totalSteps) * 100;
+                progressBar.style.width = `${progress}%`;
+
+                if (currentStep === totalSteps) {
+                    progressText.textContent = "PROGRESS SELESAI";
+                    progressText.className = "text-xs font-bold text-gray-500";
+                    progressPercentage.classList.remove('hidden');
+                } else {
+                    progressText.textContent = `PROGRESS STEP ${currentStep}/${totalSteps}`;
+                    progressText.className = "text-xs font-bold text-[#A68A56]";
+                    progressPercentage.classList.add('hidden');
+                }
+
+                btnPrev.disabled = currentStep === 1;
+
+                if (currentStep === totalSteps) {
+                    btnNext.classList.add('hidden');
+                    btnSubmit.classList.remove('hidden');
+                    updateRingkasan();
+                } else {
+                    btnNext.classList.remove('hidden');
+                    btnSubmit.classList.add('hidden');
+                }
+                
+                viewForm.scrollTop = 0;
+            }
+
+            btnNext.addEventListener('click', () => {
+                if (validateCurrentStep()) {
+                    if (currentStep < totalSteps) { currentStep++; updateUI(); }
+                }
+            });
+
+            btnPrev.addEventListener('click', () => {
+                if (currentStep > 1) { currentStep--; updateUI(); }
+            });
+
+            // Modal Logic
+            function showModal(namaBayi) {
+                document.getElementById('modalNamaBayi').textContent = namaBayi;
+                successModal.classList.remove('hidden');
+                // Trigger reflow
+                void successModal.offsetWidth;
+                successModal.classList.remove('opacity-0');
+                successModal.querySelector('div').classList.remove('scale-95');
+                successModal.querySelector('div').classList.add('scale-100');
+            }
+
+            btnCloseModal.addEventListener('click', () => {
+                successModal.classList.add('opacity-0');
+                successModal.querySelector('div').classList.remove('scale-100');
+                successModal.querySelector('div').classList.add('scale-95');
+                setTimeout(() => {
+                    successModal.classList.add('hidden');
+                    switchTab('history');
+                }, 300);
+            });
+
+            // Logika Penyimpanan ke Local Storage
+            btnSubmit.addEventListener('click', () => {
+                if (validateCurrentStep()) {
+                    const originalText = btnSubmit.innerHTML;
+                    btnSubmit.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Menyimpan...`;
+                    btnSubmit.disabled = true;
+                    
+                    setTimeout(() => {
+                        const namaBayi = document.getElementById('namaBayi').value;
+                        
+                        // Kumpulkan data termasuk tambahan opsional
+                        const newData = {
+                            id: Date.now(),
+                            timestamp: new Date().toISOString(), // Untuk filter
+                            tanggalInput: new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }),
+                            posyandu: document.getElementById('namaPosyandu').value,
+                            kabupaten: document.getElementById('kabupaten').value,
+                            namaBayi: namaBayi,
+                            berat: document.getElementById('beratBadan').value,
+                            tinggi: document.getElementById('tinggiBadan').value,
+                            lingkar: document.getElementById('lingkarKepala').value,
+                            imunisasi: document.getElementById('imunisasi').value,
+                            vitaminA: document.getElementById('vitaminA').checked,
+                            obatCacing: document.getElementById('obatCacing').checked
+                        };
+
+                        let history = JSON.parse(localStorage.getItem('posyanduHistory')) || [];
+                        history.unshift(newData); 
+                        localStorage.setItem('posyanduHistory', JSON.stringify(history));
+
+                        // Tampilkan Custom Modal
+                        showModal(namaBayi);
+                        
+                        // Reset Form
+                        document.getElementById('pelaporanForm').reset();
+                        selectKabupaten.innerHTML = '<option value="">Pilih Provinsi Terlebih Dahulu</option>';
+                        selectKabupaten.disabled = true;
+                        
+                        currentStep = 1;
+                        btnSubmit.innerHTML = originalText;
+                        btnSubmit.disabled = false;
+                        updateUI();
+                        
+                    }, 1000);
+                }
+            });
+
+            // Render Tab Histori dengan Filter
+            function renderHistory() {
+                const historyList = document.getElementById('historyList');
+                const emptyState = document.getElementById('emptyHistory');
+                const totalHistori = document.getElementById('totalHistori');
+                const filterValue = selectFilterHistory.value;
+                
+                let history = JSON.parse(localStorage.getItem('posyanduHistory')) || [];
+                
+                // Proses Filter Data
+                const now = new Date();
+                let filteredHistory = history.filter(data => {
+                    if(filterValue === 'semua') return true;
+                    
+                    const dataDate = new Date(data.timestamp);
+                    if(filterValue === 'harian') {
+                        return dataDate.toDateString() === now.toDateString();
+                    } else if(filterValue === 'bulanan') {
+                        return dataDate.getMonth() === now.getMonth() && dataDate.getFullYear() === now.getFullYear();
+                    } else if(filterValue === 'tahunan') {
+                        return dataDate.getFullYear() === now.getFullYear();
+                    }
+                    return true;
+                });
+
+                totalHistori.textContent = `${filteredHistory.length} Data`;
+                historyList.innerHTML = '';
+
+                if (filteredHistory.length === 0) {
+                    emptyState.classList.remove('hidden');
+                } else {
+                    emptyState.classList.add('hidden');
+                    
+                    filteredHistory.forEach(data => {
+                        // Cek apakah ada tindakan tambahan untuk badge UI
+                        let badgesHTML = '';
+                        if(data.imunisasi && data.imunisasi !== '-') {
+                            badgesHTML += `<span class="bg-blue-50 text-blue-600 text-[9px] px-1.5 py-0.5 rounded border border-blue-100">Imunisasi</span>`;
+                        }
+                        if(data.vitaminA || data.obatCacing) {
+                            badgesHTML += `<span class="bg-orange-50 text-orange-600 text-[9px] px-1.5 py-0.5 rounded border border-orange-100">Vitamin/Obat</span>`;
+                        }
+
+                        const card = document.createElement('div');
+                        card.className = "bg-white p-4 rounded-xl border border-gray-100 shadow-sm relative";
+                        card.innerHTML = `
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center">
+                                        <i class="ph ph-baby"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-gray-800 leading-tight">${data.namaBayi}</h4>
+                                        <p class="text-[10px] text-gray-500">${data.tanggalInput}</p>
+                                    </div>
+                                </div>
+                                <span class="bg-[#FFF9E6] text-[#A68A56] text-[10px] font-bold px-2 py-1 rounded border border-[#FFEAB3]">Tersimpan</span>
+                            </div>
+                            <div class="mt-3 pt-3 border-t border-gray-50 flex flex-wrap gap-x-4 gap-y-2">
+                                <div class="flex flex-col w-full">
+                                    <span class="text-[10px] text-gray-400 font-semibold uppercase">Posyandu</span>
+                                    <span class="text-xs text-gray-700">${data.posyandu} - ${data.kabupaten}</span>
+                                </div>
+                                <div class="flex gap-4 w-full mt-1 bg-gray-50 p-2 rounded">
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] text-gray-400 font-semibold uppercase">Berat</span>
+                                        <span class="text-xs font-bold text-gray-800">${data.berat} kg</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] text-gray-400 font-semibold uppercase">Tinggi</span>
+                                        <span class="text-xs font-bold text-gray-800">${data.tinggi} cm</span>
+                                    </div>
+                                     <div class="flex flex-col">
+                                        <span class="text-[10px] text-gray-400 font-semibold uppercase">Lingkar Kepala</span>
+                                        <span class="text-xs font-bold text-gray-800">${data.lingkar} cm</span>
+                                    </div>
+                                </div>
+                                <!-- Tempat Badges Tindakan Opsional -->
+                                ${badgesHTML ? `<div class="flex gap-1 mt-1 w-full">${badgesHTML}</div>` : ''}
+                            </div>
+                        `;
+                        historyList.appendChild(card);
+                    });
+                }
+            }
+
+            // Inisialisasi tampilan awal
+            updateUI();
+        });
+    </script>
+</body>
+</html>
